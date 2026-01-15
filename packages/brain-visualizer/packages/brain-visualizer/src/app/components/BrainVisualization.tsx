@@ -144,15 +144,13 @@ function NeuralConnections({ regions }: { regions: BrainRegion[] }) {
   return (
     <>
       {connections.map((conn, index) => (
-        <NeuralConnection key={index} start={conn.start} end={conn.end} color={conn.color} index={index} />
+        <NeuralConnection key={index} start={conn.start} end={conn.end} color={conn.color} />
       ))}
     </>
   );
 }
 
-function NeuralConnection({ start, end, color, index }: { start: [number, number, number]; end: [number, number, number]; color: string; index: number }) {
-  const lineRef = useRef<THREE.Line>(null);
-
+function NeuralConnection({ start, end, color }: { start: [number, number, number]; end: [number, number, number]; color: string }) {
   const points = useMemo(() => {
     const startVec = new THREE.Vector3(...start);
     const endVec = new THREE.Vector3(...end);
@@ -173,16 +171,10 @@ function NeuralConnection({ start, end, color, index }: { start: [number, number
     return geom;
   }, [points]);
 
-  useFrame((state) => {
-    if (lineRef.current) {
-      const material = lineRef.current.material as THREE.LineBasicMaterial;
-      material.opacity = (Math.sin(state.clock.elapsedTime * 2 + index) * 0.3 + 0.5);
-    }
-  });
-
   return (
-    <line ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial color={color} transparent opacity={0.5} linewidth={2} />
+    <line>
+      <bufferGeometry attach="geometry" {...geometry} />
+      <lineBasicMaterial color={color} transparent opacity={0.6} linewidth={2} />
     </line>
   );
 }
@@ -207,4 +199,7 @@ export default function BrainVisualization({ activeRegions }: BrainVisualization
     </div>
   );
 }
+
+
+
 
