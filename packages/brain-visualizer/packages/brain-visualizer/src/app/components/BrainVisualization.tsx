@@ -132,7 +132,7 @@ function ActiveRegion({ region, index }: { region: BrainRegion; index: number })
 
 function NeuralConnections({ regions }: { regions: BrainRegion[] }) {
   const connections = useMemo(() => {
-    const conns = [];
+    const conns: Array<{ start: [number, number, number]; end: [number, number, number]; color: string }> = [];
     for (let i = 0; i < regions.length - 1; i++) {
       for (let j = i + 1; j < regions.length; j++) {
         conns.push({ start: regions[i].position, end: regions[j].position, color: regions[i].color });
@@ -199,6 +199,7 @@ export default function BrainVisualization({ activeRegions }: BrainVisualization
     </div>
   );
 }
+
 
 
 
