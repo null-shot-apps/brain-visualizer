@@ -1,84 +1,129 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
 
-const slogans = [
-  "Turn chats into apps",
-  "Prompt. Ship. Repeat.",
-  "Build anything from a chat",
-  "Ideas → Apps, instantly",
-  "From zero to MVP in minutes",
-  "Your cofounder in the command line",
-  "Draft, iterate, deploy",
-  "Ship faster than you can type",
-  "Design in text, deliver in code",
-  "Dream it. Prompt it. Run it.",
-  "Chat-native app building",
-  "From prompt to product",
-  "One prompt, infinite apps",
-  "Stop scaffolding. Start shipping.",
-  "Prototype at the speed of thought",
-  "Make conversations executable"
+const BrainVisualization = dynamic(() => import('./components/BrainVisualization'), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="text-white/60 text-lg">Loading 3D visualization...</div>
+    </div>
+  ),
+});
+
+type Emotion = 'happy' | 'sad' | 'angry' | 'fearful' | 'excited' | 'calm';
+
+const emotions: { id: Emotion; label: string; description: string; gradient: string }[] = [
+  { 
+    id: 'happy', 
+    label: 'Happy', 
+    description: 'Joy & Pleasure',
+    gradient: 'from-yellow-400 to-orange-500'
+  },
+  { 
+    id: 'sad', 
+    label: 'Sad', 
+    description: 'Melancholy & Grief',
+    gradient: 'from-blue-400 to-blue-600'
+  },
+  { 
+    id: 'angry', 
+    label: 'Angry', 
+    description: 'Rage & Frustration',
+    gradient: 'from-red-500 to-red-700'
+  },
+  { 
+    id: 'fearful', 
+    label: 'Fearful', 
+    description: 'Anxiety & Threat',
+    gradient: 'from-purple-400 to-purple-700'
+  },
+  { 
+    id: 'excited', 
+    label: 'Excited', 
+    description: 'Arousal & Anticipation',
+    gradient: 'from-green-400 to-green-600'
+  },
+  { 
+    id: 'calm', 
+    label: 'Calm', 
+    description: 'Peace & Relaxation',
+    gradient: 'from-teal-400 to-cyan-500'
+  },
 ];
 
-export default function Landing() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isVisible, setIsVisible] = useState(true);
+export default function BrainVisualizer() {
+  const [activeEmotions, setActiveEmotions] = useState<Emotion[]>(['happy']);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIsVisible(false);
-      setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % slogans.length);
-        setIsVisible(true);
-      }, 400);
-    }, 2800);
-
-    return () => clearInterval(interval);
-  }, []);
+  const toggleEmotion = (emotion: Emotion) => {
+    setActiveEmotions(prev => 
+      prev.includes(emotion) 
+        ? prev.filter(e => e !== emotion)
+        : [...prev, emotion]
+    );
+  };
 
   return (
-    <div className="relative h-[100dvh] w-full overflow-hidden bg-black text-white">
-      {/* Enhanced animated aurora background layers */}
-      <div className="absolute inset-0 bg-aurora-layer-1" />
-      <div className="absolute inset-0 bg-aurora-layer-2" />
-      <div className="absolute inset-0 bg-aurora-layer-3" />
-      
-      {/* Floating particles overlay */}
-      <div className="absolute inset-0 bg-particles" />
-      
-      {/* Main content - centered */}
-      <main className="relative z-10 h-full flex flex-col items-center justify-center px-6">
-        <h1 className="text-center text-[clamp(28px,6vw,64px)] font-medium tracking-tight mb-4">
-          Turn Chats into Apps
-        </h1>
-        
-        {/* Rotating slogans */}
-        <div className="mt-4 h-8 md:h-10 overflow-hidden flex items-center justify-center">
-          <span
-            className={`inline-block text-center text-[clamp(18px,3vw,32px)] font-light transition-all duration-[400ms] ease-in-out ${
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-            }`}
-          >
-            {slogans[currentIndex]}
-          </span>
+    <div className="relative h-[100dvh] w-full overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900">
+      {/* Header */}
+      <header className="absolute top-0 left-0 right-0 z-20 p-6 md:p-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl md:text-5xl font-bold text-white mb-2 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+            Brain Activity Visualizer
+          </h1>
+          <p className="text-white/60 text-sm md:text-base">
+            Explore neural patterns across different emotional states
+          </p>
         </div>
-      </main>
-      
-      {/* Start Prompting arrow pointing left - bottom left */}
-      <div className="absolute left-6 md:left-8 bottom-[5%] z-20 flex items-center gap-3 arrow-point-left">
-        <div className="flex items-center gap-2 text-white/80 font-medium text-sm md:text-base">
-          <svg 
-            className="w-5 h-5 md:w-6 md:h-6 animate-bounce-horizontal" 
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span>Start prompting</span>
+      </header>
+
+      {/* 3D Visualization */}
+      <div className="absolute inset-0 pt-32 pb-32 md:pb-40">
+        <BrainVisualization activeRegions={activeEmotions} />
+      </div>
+
+      {/* Emotion Controls */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 p-4 md:p-8 bg-gradient-to-t from-black/80 via-black/60 to-transparent backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+            {emotions.map((emotion) => {
+              const isActive = activeEmotions.includes(emotion.id);
+              return (
+                <button
+                  key={emotion.id}
+                  onClick={() => toggleEmotion(emotion.id)}
+                  className={`
+                    relative overflow-hidden rounded-xl p-4 md:p-5 transition-all duration-300
+                    ${isActive 
+                      ? `bg-gradient-to-br ${emotion.gradient} shadow-lg shadow-${emotion.gradient.split('-')[1]}-500/50 scale-105` 
+                      : 'bg-white/10 hover:bg-white/20 backdrop-blur-sm'
+                    }
+                  `}
+                >
+                  <div className="relative z-10">
+                    <div className={`text-lg md:text-xl font-bold mb-1 ${isActive ? 'text-white' : 'text-white/90'}`}>
+                      {emotion.label}
+                    </div>
+                    <div className={`text-xs md:text-sm ${isActive ? 'text-white/90' : 'text-white/60'}`}>
+                      {emotion.description}
+                    </div>
+                  </div>
+                  {isActive && (
+                    <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+          
+          {/* Info text */}
+          <div className="mt-4 text-center text-white/50 text-xs md:text-sm">
+            Click emotions to see active brain regions • Drag to rotate • Scroll to zoom
+          </div>
         </div>
       </div>
     </div>
   );
 }
+
